@@ -143,10 +143,10 @@ fn main() {
                         Cargo project, this flag changes it to look in them."),
                 )
                 .arg(
-                    Arg::with_name("dry-run")
+                    Arg::with_name("delete")
                         .short("d")
-                        .long("dry-run")
-                        .help("Dry run which will not delete any files"),
+                        .long("delete")
+                        .help("Delete matching files instead of a dry-run"),
                 )
                 .arg(
                     Arg::with_name("stamp")
@@ -206,7 +206,7 @@ fn main() {
         let verbose = matches.is_present("verbose");
         setup_logging(verbose);
 
-        let dry_run = matches.is_present("dry-run");
+        let delete = matches.is_present("delete");
 
         // Default to current invocation path.
         let path = match matches.value_of("path") {
@@ -240,8 +240,8 @@ fn main() {
 
         if matches.is_present("installed") || matches.is_present("toolchains") {
             for project_path in &paths {
-                match remove_not_built_with(project_path, matches.value_of("toolchains"), dry_run) {
-                    Ok(cleaned_amount) if dry_run => {
+                match remove_not_built_with(project_path, matches.value_of("toolchains"), delete) {
+                    Ok(cleaned_amount) if !delete => {
                         info!("Would clean: {}", format_bytes(cleaned_amount))
                     }
                     Ok(cleaned_amount) => info!("Cleaned {}", format_bytes(cleaned_amount)),
@@ -262,8 +262,8 @@ fn main() {
             };
 
             for project_path in &paths {
-                match remove_older_until_fits(project_path, size, dry_run) {
-                    Ok(cleaned_amount) if dry_run => {
+                match remove_older_until_fits(project_path, size, delete) {
+                    Ok(cleaned_amount) if !delete => {
                         info!("Would clean: {}", format_bytes(cleaned_amount))
                     }
                     Ok(cleaned_amount) => info!("Cleaned {}", format_bytes(cleaned_amount)),
@@ -284,8 +284,8 @@ fn main() {
             };
 
             for project_path in &paths {
-                match remove_older_than(project_path, &keep_duration, dry_run) {
-                    Ok(cleaned_amount) if dry_run => {
+                match remove_older_than(project_path, &keep_duration, delete) {
+                    Ok(cleaned_amount) if !delete => {
                         info!("Would clean: {}", format_bytes(cleaned_amount))
                     }
                     Ok(cleaned_amount) => info!("Cleaned {}", format_bytes(cleaned_amount)),
